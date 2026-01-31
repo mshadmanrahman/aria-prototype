@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARIA Prototype 2: Conversational Search | educations.com</title>
+    <link rel="stylesheet" href="shared-styles.css">
+    <style>
+        /* Prototype 2 Specific Styles */
+
+        /* Conversational Search Box */
+        .conversational-search {
+            background-color: var(--background-white);
+            border: 2px solid var(--primary-magenta);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-md);
+            margin-top: var(--spacing-lg);
+            transition: all 0.3s;
+        }
+
+        .conversational-search:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .search-label {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            color: var(--primary-magenta);
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .search-label svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .conversational-input {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-family: var(--font-family);
+            resize: none;
+            min-height: 40px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .conversational-input:focus {
+            outline: none;
+            border-color: var(--primary-magenta);
+            box-shadow: 0 0 0 3px rgba(163, 22, 77, 0.1);
+        }
+
+        .search-subtitle {
+            font-size: 14px;
+            color: var(--text-medium);
+            margin-top: var(--spacing-sm);
+        }
+
+        .example-questions {
+            margin-top: var(--spacing-md);
+        }
+
+        .example-questions-label {
+            font-size: 13px;
+            color: var(--text-medium);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .example-chips {
+            display: flex;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+        }
+
+        .example-chip {
+            padding: 8px 14px;
+            background-color: #f9fafb;
+            border: 1px solid var(--border-light);
+            color: var(--text-dark);
+            border-radius: var(--radius-full);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .example-chip:hover {
+            background-color: var(--primary-magenta);
+            color: white;
+            border-color: var(--primary-magenta);
+        }
+
+        /* Conversation Modal (Full Screen) */

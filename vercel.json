@@ -1,0 +1,6 @@
+{
+  "buildCommand": "echo 'No build required'",
+  "outputDirectory": ".",
+  "devCommand": "python3 -m http.server 3000",
+  "installCommand": "echo 'No install required'"
+}

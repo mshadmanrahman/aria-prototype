@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>educations.com | Study Abroad Requirements, Programs & Application</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Precise Header -->
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="#" class="logo-link">
+                <img src="https://keystoneacademic-res.cloudinary.com/image/upload/logos/black/educationscom_rgb_black.svg"
+                    alt="educations.com logo" class="logo-img">
+            </a>
+            <nav class="site-nav">
+                <a href="#">Course search</a>
+                <a href="#">Universities</a>
+                <a href="#">Student guides</a>
+                <a href="#" class="nav-login"><i class="fa-regular fa-user"></i> Log in</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Precise Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Find the right program for you</h1>
+            <p class="hero-sub">Compare thousands of degrees, study abroad programs, and more.</p>
+
+            <!-- Precise Stacked Search Bar -->
+            <div class="search-container-stacked">
+                <div class="search-input-wrapper">
+                    <i class="fa-solid fa-graduation-cap input-icon"></i>
+                    <input type="text" placeholder="Choose field of interest">
+                    <i class="fa-solid fa-chevron-down dropdown-icon"></i>
+                </div>
+
+                <div class="search-input-wrapper">
+                    <i class="fa-solid fa-location-dot input-icon"></i>
+                    <input type="text" placeholder="Choose study destination">
+                    <i class="fa-solid fa-chevron-down dropdown-icon"></i>
+                </div>
+
+                <button class="btn-search-main">Search</button>
+
+                <!-- ARIA Trigger injected here -->
+                <div class="aria-trigger-floating">
+                    <button id="askAriaBtn" class="btn-aria-pill">
+                        <i class="fa-solid fa-sparkles"></i> Ask ARIA
+                    </button>
+                    <!-- <div class="aria-tooltip">New! Try AI Search</div> -->
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ARIA Overlay (Kept mostly same, just styling updates) -->
+    <div class="aria-overlay" id="ariaOverlay">
+        <div class="aria-backdrop" id="ariaBackdrop"></div>
+        <div class="aria-modal">
+            <div class="aria-header">
+                <div class="aria-identity">
+                    <div class="aria-avatar">
+                        <i class="fa-solid fa-sparkles"></i>
+                    </div>
+                    <div class="aria-title">
+                        <h3>ARIA</h3>
+                        <span class="aria-subtitle">Your AI Study Assistant</span>
+                    </div>
+                </div>
+                <button class="aria-close" id="closeAriaBtn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="aria-chat-area" id="ariaChatArea">
+                <div class="message aria-message typing">
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                </div>
+            </div>
+
+            <div class="aria-input-area">
+                <div class="aria-input-wrapper">
+                    <input type="text" id="ariaInput" placeholder="Describe your ideal program..." autocomplete="off">
+                    <button id="ariaSendBtn" class="btn-send"><i class="fa-solid fa-paper-plane"></i></button>
+                </div>
+                <div class="aria-suggestions" id="ariaSuggestions"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

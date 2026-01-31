@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARIA Powered Search Prototypes | educations.com</title>
+    <link rel="stylesheet" href="shared-styles.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-lg);
+        }
+
+        .landing-container {
+            max-width: 1000px;
+            background: var(--background-white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+
+        .landing-header {
+            background: linear-gradient(135deg, var(--primary-magenta), #7b1042);
+            color: white;
+            padding: var(--spacing-xl);
+            text-align: center;
+        }
+
+        .landing-header h1 {
+            font-size: 36px;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .landing-header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .prototypes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: var(--spacing-lg);
+            padding: var(--spacing-xl);
+        }
+
+        .prototype-card {
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            transition: all 0.3s;
+        }
+
+        .prototype-card:hover {
+            border-color: var(--primary-magenta);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-4px);
+        }
+
+        .prototype-card h2 {
+            font-size: 24px;
+            margin-bottom: var(--spacing-md);
+            color: var(--primary-magenta);
+        }
+
+        .prototype-card p {
+            color: var(--text-medium);
+            line-height: 1.6;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .prototype-card ul {
+            list-style: none;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .prototype-card li {
+            padding: var(--spacing-xs) 0;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .prototype-card li::before {
+            content: "✓";
+            color: var(--aria-green);
+            font-weight: bold;
+        }
+
+        .demo-btn {
+            width: 100%;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, var(--aria-green), var(--secondary-teal));
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .info-section {
+            background: #f9fafb;
+            padding: var(--spacing-xl);
+            border-top: 1px solid var(--border-light);
+        }
+
+        .info-section h3 {
+            font-size: 20px;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .info-section p {
+            color: var(--text-medium);
+            line-height: 1.7;
+        }
+
+        @media (max-width: 768px) {
+            .prototypes-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .landing-header h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="landing-container">
+        <div class="landing-header">
+            <img src="educations-logo.png" alt="educations.com" style="height: 40px; margin-bottom: 16px;">
+            <h1>🎯 ARIA Powered Search Prototypes</h1>
+            <p>Interactive demos for Product & Technology Leadership</p>
+        </div>
+
+        <div class="prototypes-grid">
+            <!-- Prototype 1 -->
+            <div class="prototype-card">
+                <h2>💬 Prototype 1: Chat Widget</h2>
+                <p>Traditional search enhanced with an AI chat assistant that appears as a side panel.</p>
+                <ul>
+                    <li>Keeps existing search interface</li>
+                    <li>Adds ARIA chat widget option</li>
+                    <li>Side-by-side comparison</li>
+                    <li>Low-friction user experience</li>
+                </ul>
+                <a href="prototype1.html" class="demo-btn">View Demo →</a>
+            </div>
+
+            <!-- Prototype 2 -->
+            <div class="prototype-card">
+                <h2>🔍 Prototype 2: Conversational Search</h2>
+                <p>Reddit Answers-style experience that replaces traditional search with AI conversation.</p>
+                <ul>
+                    <li>Single conversational input</li>
+                    <li>Full-screen conversation modal</li>
+                    <li>Natural dialogue flow</li>
+                    <li>Guided discovery experience</li>
+                </ul>
+                <a href="prototype2.html" class="demo-btn">View Demo →</a>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h3>📋 About These Prototypes</h3>
+            <p>
+                These interactive prototypes demonstrate two approaches to integrating ARIA—the AI study abroad
+                assistant—into the educations.com search experience. Both prototypes feature simulated AI responses,
+                realistic conversation flows, and match the educations.com brand design exactly.
+            </p>
+            <br>
+            <p>
+                <strong>Built for:</strong> Keystone Education Group<br>
+                <strong>Presented by:</strong> Shadman Rahman, Senior Product Manager<br>
+                <strong>Date:</strong> February 2026
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

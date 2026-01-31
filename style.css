@@ -1,0 +1,624 @@
+:root {
+    --primary-color: #AD1457;
+    --primary-hover: #880e4f;
+    --text-dark: #424242;
+    /* Updated from site inspection */
+    --text-light: #666666;
+    --bg-light: #f5f5f5;
+    --white: #ffffff;
+    --border-radius: 8px;
+    /* Verified */
+    --font-heading: 'Poppins', sans-serif;
+    /* Fallback matches */
+    --font-body: 'Open Sans', sans-serif;
+    --hero-gradient: linear-gradient(rgb(237, 237, 236) 20%, rgb(248, 242, 228) 100%);
+    --shadow-search: rgba(102, 102, 102, 0.2) 0px 4px 8px 0px;
+    /* Exact value */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: rgb(249, 249, 249);
+    color: var(--text-dark);
+}
+
+/* Header - Exact 68px height */
+.site-header {
+    background: var(--white);
+    height: 68px;
+    display: flex;
+    justify-content: center;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    /* Subtle shadow inferred */
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-inner {
+    width: 100%;
+    max-width: 1280px;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo-img {
+    height: 32px;
+    width: auto;
+    display: block;
+}
+
+.site-nav {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.site-nav a {
+    text-decoration: none;
+    color: var(--text-dark);
+    font-weight: 600;
+    /* Verified */
+    font-size: 14px;
+    /* Verified */
+    font-family: var(--font-body);
+}
+
+.nav-login {
+    color: var(--primary-color) !important;
+}
+
+/* Hero Section */
+.hero {
+    background: var(--hero-gradient);
+    min-height: 600px;
+    /* Approximation based on bg image */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 80px;
+    /* Spacing for heading */
+    position: relative;
+    /* Adding the woman image as absolute positioned background if needed, 
+       but for prototype cleaner to keep focused on search. 
+       Let's use a subtle pattern or just the gradient as captured. */
+}
+
+.hero-content {
+    max-width: 800px;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    z-index: 10;
+}
+
+.hero h1 {
+    font-family: 'Poppins', sans-serif;
+    /* Confirmed visually */
+    font-weight: 700;
+    font-size: 36px;
+    /* Verified */
+    line-height: 48px;
+    color: var(--text-dark);
+    margin-bottom: 16px;
+}
+
+.hero-sub {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 18px;
+    /* Estimated */
+    color: var(--text-dark);
+    margin-bottom: 48px;
+    font-weight: 400;
+}
+
+/* Precise Stacked Search Bar */
+/* The site uses stacked inputs max-width ~500px centered */
+.search-container-stacked {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    /* Slight gap between inputs */
+    position: relative;
+}
+
+.search-input-wrapper {
+    background: var(--white);
+    height: 50px;
+    /* Verified */
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-search);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    border: 1px solid transparent;
+    /* To prevent layout shift on focus */
+    transition: border-color 0.2s;
+}
+
+.search-input-wrapper:hover {
+    border-color: #ccc;
+}
+
+.input-icon {
+    color: #757575;
+    margin-right: 12px;
+    font-size: 18px;
+}
+
+.dropdown-icon {
+    color: #757575;
+    margin-left: auto;
+    font-size: 14px;
+}
+
+.search-input-wrapper input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-family: var(--font-body);
+    font-size: 16px;
+    color: var(--text-dark);
+}
+
+.search-input-wrapper input::placeholder {
+    color: #757575;
+}
+
+.btn-search-main {
+    height: 48px;
+    /* Verified */
+    background-color: var(--primary-color);
+    color: var(--white);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    /* Verified text style */
+    font-size: 16px;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    box-shadow: var(--shadow-search);
+    transition: background-color 0.2s;
+    margin-top: 8px;
+    /* Gap for button */
+}
+
+.btn-search-main:hover {
+    background-color: var(--primary-hover);
+}
+
+/* ARIA Trigger - Floating Pill Style */
+.aria-trigger-floating {
+    position: absolute;
+    right: -140px;
+    /* Float to the side */
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+}
+
+.btn-aria-pill {
+    background: white;
+    padding: 10px 20px;
+    border-radius: 50px;
+    border: 2px solid transparent;
+    background-image: linear-gradient(white, white),
+        linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    color: #333;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+
+.btn-aria-pill i {
+    background: -webkit-linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.btn-aria-pill:hover {
+    transform: scale(1.05);
+}
+
+/* Modal Styling - Keeping previous good styles but refining font */
+.aria-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+    background: rgba(0, 0, 0, 0.4);
+    /* Darker backdrop */
+}
+
+/* ARIA Overlay/Modal */
+.aria-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.aria-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+}
+
+.aria-modal {
+    width: 600px;
+    max-width: 90%;
+    height: 500px;
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    font-family: var(--font-body);
+}
+
+.aria-overlay.active .aria-modal {
+    transform: scale(1);
+}
+
+/* ARIA Chat UI */
+.aria-header {
+    padding: 1rem;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+}
+
+.aria-identity {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.aria-avatar {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.aria-title h3 {
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    margin: 0;
+}
+
+.aria-subtitle {
+    font-size: 0.75rem;
+    color: var(--text-light);
+}
+
+.aria-close {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.aria-chat-area {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background: #fcfcfc;
+}
+
+.message {
+    max-width: 80%;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    position: relative;
+}
+
+.aria-message {
+    background: var(--white);
+    border: 1px solid #eee;
+    border-bottom-left-radius: 2px;
+    align-self: flex-start;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+}
+
+.user-message {
+    background: var(--primary-color);
+    color: var(--white);
+    border-bottom-right-radius: 2px;
+    align-self: flex-end;
+}
+
+.aria-input-area {
+    padding: 1rem;
+    background: var(--white);
+    border-top: 1px solid #f0f0f0;
+}
+
+.aria-input-wrapper {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    position: relative;
+}
+
+.aria-input-wrapper input {
+    flex: 1;
+    padding: 0.8rem 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 24px;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.aria-input-wrapper input:focus {
+    border-color: var(--primary-color);
+}
+
+.btn-send {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: var(--primary-color);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.btn-send:hover {
+    background: var(--primary-hover);
+}
+
+.aria-suggestions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    min-height: 30px;
+}
+
+.chip {
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    padding: 0.4rem 0.8rem;
+    border-radius: 16px;
+    font-size: 0.85rem;
+    color: var(--text-dark);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.chip:hover {
+    background: #e0e0e0;
+    border-color: #ccc;
+}
+
+/* Typing Indicator */
+.typing {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 1rem !important;
+}
+
+.dot {
+    width: 6px;
+    height: 6px;
+    background: #ccc;
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.dot:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.dot:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+/* Result Cards */
+.result-carousel {
+    display: flex;
+    overflow-x: auto;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    width: 100%;
+    scrollbar-width: thin;
+}
+
+.program-card {
+    min-width: 260px;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+}
+
+.program-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+.card-img {
+    height: 120px;
+    background-size: cover;
+    background-position: center;
+}
+
+.card-body {
+    padding: 1rem;
+}
+
+.card-uni {
+    font-size: 0.75rem;
+    color: #666;
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.card-title {
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #333;
+    line-height: 1.3;
+}
+
+.card-meta {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+.card-meta i {
+    color: var(--primary-color);
+}
+
+.btn-card-action {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background: #fdf2f6;
+    color: var(--primary-color);
+    text-decoration: none;
+    padding: 0.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+}
+
+.btn-card-action:hover {
+    background: #f8e1ea;
+}
+
+/* Value Exchange / Lead Capture Styling */
+.lead-capture-container {
+    background: #f9f9f9;
+    padding: 1.5rem;
+    border-radius: 12px;
+    text-align: center;
+    border: 1px solid #eee;
+    margin-top: 1rem;
+}
+
+.lead-capture-title {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.lead-capture-text {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+.lead-capture-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.btn-primary-small {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-primary-small:hover {
+    background: var(--primary-hover);
+}
+
+.btn-secondary-small {
+    background: #fff;
+    color: #666;
+    border: 1px solid #ddd;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+@keyframes bounce {
+
+    0%,
+    80%,
+    100% {
+        transform: scale(0);
+    }
+
+    40% {
+        transform: scale(1);
+    }
+}

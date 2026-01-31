@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ARIA Prototype 1: Chat Widget | educations.com</title>
+  <link rel="stylesheet" href="shared-styles.css">
+  <style>
+    /* Prototype 1 Specific Styles - Modal Version */
+
+    /* Modal Overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Chat Panel Modal */
+    .chat-panel {
+      background-color: var(--background-white);
+      border-radius: var(--radius-lg);
+      width: 90%;
+      max-width: 700px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      transform: scale(0.9);
+      transition: transform 0.3s;
+    }
+
+    .modal-overlay.open .chat-panel {
+      transform: scale(1);
+    }
+
+    .chat-header {
+      padding: 20px;
+      background: linear-gradient(135deg, var(--primary-magenta), #7b1042);
+      color: white;
+      border-radius: 12px 12px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .chat-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: white;
+      color: var(--primary-magenta);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .close-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .close-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .chat-container {
+      background: white;
+      padding: 20px;
+      height: 400px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .send-btn {
+      width: 40px;
+      height: 40px;
+      background: var(--primary-magenta);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .send-btn:hover {
+      background: var(--primary-magenta-hover);
+      transform: scale(1.05);
+    }
+
+    .chat-input-wrapper {
+      padding: 16px 20px;
+      background: white;
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      border-radius: 0 0 12px 12px;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 10px 14px;
+      border: 1px solid #e5e7eb;
+      border-radius: 20px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .chat-input:focus {
+      border-color: var(--primary-magenta);
+    }
+
+
+    .chat-panel-header {
+      padding: var(--spacing-md) var(--spacing-lg);
+      background: linear-gradient(135deg, var(--aria-green), var(--secondary-teal));
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    .chat-panel-header h2 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .chat-panel-header p {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+
+    .close-chat-btn {
+      width: 32px;
+      height: 32px;
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      border-radius: var(--radius-sm);
+      color: white;
+      cursor: pointer;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s;
+    }
+
+    .close-chat-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Chat Toggle Button */
+    .chat-toggle-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--aria-green), var(--secondary-teal));
+      border: none;
+      border-radius: var(--radius-full);
+      color: white;
+      cursor: pointer;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      transition: all 0.3s;
+      z-index: 150;
+    }
+
+    .chat-toggle-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+    }
+
+    .chat-toggle-btn.hidden {
+      display: none;
+    }
+
+    /* Search Divider */
+    .search-divider {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      margin: var(--spacing-lg) 0;
+      color: var(--text-medium);
+      font-size: 14px;
+    }
+
+    .search-divider::before,
+    .search-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background-color: var(--border-light);
+    }
+
+    .ask-aria-btn {
+      width: 100%;
+      padding: 14px 20px;
+      background: linear-gradient(135deg, var(--aria-green), var(--secondary-teal));
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: var(--spacing-md);
+    }
+
+    .ask-aria-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Quick Links */
+    .quick-links {
+      display: flex;
+      gap: var(--spacing-sm);
+      flex-wrap: wrap;
+      margin-top: var(--spacing-md);
+    }
+
+    .quick-link {
+      padding: 6px 12px;
+      background-color: #fce4ec;
+      color: var(--primary-magenta);
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .quick-link:hover {
+      background-color: var(--primary-magenta);
+      color: white;
+    }
+
+    /* Listing Link in Chat */
+    .listing-link-card {
+      background: linear-gradient(135deg, var(--primary-magenta), #7b1042);
+      color: white;
+      padding: var(--spacing-lg);
+      border-radius: var(--radius-md);
+      margin: var(--spacing-md) 0;
+      text-decoration: none;
+      display: block;
+      transition: all 0.2s;
+    }
+
+    .listing-link-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .listing-link-card h4 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .listing-link-card p {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .listing-link-card .cta {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-full);
+      margin-top: var(--spacing-sm);
+    }
+
+    @media (max-width: 768px) {
+      .chat-panel {
+        width: 95%;
+        max-height: 90vh;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <a href="#" class="logo">
+        <img src="educations-logo.png" alt="educations.com">
+      </a>
+      <nav class="nav">
+        <a href="#" class="nav-link">Programs</a>
+        <a href="#" class="nav-link">Resources</a>
+        <a href="#" class="btn btn-secondary">Recommend me a program</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1>120,000+ study abroad programs, one perfect for you.</h1>
+
+        <!-- Traditional Search Card -->
+        <div class="search-card">
+          <div class="input-wrapper">
+            <svg class="input-icon" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd"
+                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                clip-rule="evenodd" />
+            </svg>
+            <input type="text" class="search-input" placeholder="What do you want to study?"
+              style="padding-left: 40px;">
+          </div>
+
+          <div class="input-wrapper">
+            <svg class="input-icon" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd"
+                d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                clip-rule="evenodd" />
+            </svg>
+            <input type="text" class="search-input" placeholder="Where do you want to study?"
+              style="padding-left: 40px;">
+          </div>
+
+          <button class="btn btn-primary" style="width: 100%; margin-top: 12px;">Search programs</button>
+
+          <div class="search-divider">or try something new</div>
+
+          <button class="ask-aria-btn" onclick="openChat()">
+            <span style="font-size: 20px; margin-right: 8px;">💬</span>
+            Ask ARIA - Your AI Study Abroad Assistant
+          </button>
+
+          <div class="quick-links">
+            <a href="#" class="quick-link">Bachelor's degrees</a>
+            <a href="#" class="quick-link">Master's degrees</a>
+            <a href="#" class="quick-link">Online programs</a>
+            <a href="#" class="quick-link">Scholarships</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-image"></div>
+    </div>
+  </section>
+
+  <!-- Modal Overlay + Chat Panel -->
+  <div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+    <div class="chat-panel" onclick="event.stopPropagation()">
+      <div class="chat-header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="chat-avatar">A</div>
+          <div>
+            <h3 style="margin: 0; font-size: 18px;">ARIA</h3>
+            <span style="font-size: 12px; color: var(--gray-600);">AI Study Abroad Assistant</span>
+          </div>
+        </div>
+        <button class="close-btn" onclick="closeChat()">×</button>
+      </div>
+
+      <div class="chat-container" id="chatContainer">
+        <!-- Messages will be added by JS -->
+      </div>
+
+      <div class="chat-input-wrapper">
+        <input type="text" class="chat-input" id="chatInput" placeholder="Type your message..."
+          onkeydown="handleChatKeydown(event)" />
+        <button class="send-btn" onclick="sendMessage()" id="sendBtn">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- What do you want to study? -->
+  <section style="padding: 60px 20px; max-width: 1200px; margin: 0 auto;">
+    <h2 style="font-size: 28px; font-weight: 700; margin-bottom: 40px; text-align: center;">What do you want to study?
+    </h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+      <div style="border: 1px solid #e0e0e0; padding: 24px; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+        <h3 style="color: #a3164d; font-size: 18px; margin-bottom: 8px;">Business Degrees</h3>
+        <p style="color: #666; font-size: 14px;">MBA programs and more</p>
+      </div>
+      <div style="border: 1px solid #e0e0e0; padding: 24px; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+        <h3 style="color: #a3164d; font-size: 18px; margin-bottom: 8px;">Engineering Degrees</h3>
+        <p style="color: #666; font-size: 14px;">1000+ programs</p>
+      </div>
+      <div style="border: 1px solid #e0e0e0; padding: 24px; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+        <h3 style="color: #a3164d; font-size: 18px; margin-bottom: 8px;">Computer Science Degrees</h3>
+        <p style="color: #666; font-size: 14px;">Tech and IT programs</p>
+      </div>
+      <div style="border: 1px solid #e0e0e0; padding: 24px; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+        <h3 style="color: #a3164d; font-size: 18px; margin-bottom: 8px;">Popular Degrees</h3>
+        <p style="color: #666; font-size: 14px;">Explore top programs</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Begin your study abroad journey -->
+  <section style="background: #f9fafb; padding: 60px 20px;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <h2 style="font-size: 28px; font-weight: 700; margin-bottom: 40px; text-align: center;">Begin your study abroad
+        journey</h2>
+      <div
+        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; text-align: center;">
+        <div>
+          <div style="width: 80px; height: 80px; margin: 0 auto 20px;">
+            <img src="icon-find-program.png" alt="Find a program" style="width: 100%; height: 100%;">
+          </div>
+          <h3 style="font-size: 18px; margin-bottom: 12px;">Find a program</h3>
+          <p style="color: #666; font-size: 14px;">Browse thousands of programs</p>
+        </div>
+        <div>
+          <div style="width: 80px; height: 80px; margin: 0 auto 20px;">
+            <img src="icon-scholarships.png" alt="Get scholarships" style="width: 100%; height: 100%;">
+          </div>
+          <h3 style="font-size: 18px; margin-bottom: 12px;">Get scholarships</h3>
+          <p style="color: #666; font-size: 14px;">Find funding opportunities</p>
+        </div>
+        <div>
+          <div style="width: 80px; height: 80px; margin: 0 auto 20px;">
+            <img src="icon-brochures.png" alt="Get brochures" style="width: 100%; height: 100%;">
+          </div>
+          <h3 style="font-size: 18px; margin-bottom: 12px;">Get university brochures</h3>
+          <p style="color: #666; font-size: 14px;">Request information directly</p>
+        </div>
+        <div>
+          <div style="width: 80px; height: 80px; margin: 0 auto 20px;">
+            <img src="icon-stay-updated.png" alt="Stay updated" style="width: 100%; height: 100%;">
+          </div>
+          <h3 style="font-size: 18px; margin-bottom: 12px;">Stay up-to-date</h3>
+          <p style="color: #666; font-size: 14px;">Get the latest news and tips</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Explore highly-ranked countries -->
+  <section style="padding: 60px 20px; max-width: 1200px; margin: 0 auto;">
+    <h2 style="font-size: 28px; font-weight: 700; margin-bottom: 40px;">Explore highly-ranked countries</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+      <div
+        style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; cursor: pointer; transition: all 0.2s;">
+        <div
+          style="height: 180px; background-image: url('country-uk.png'); background-size: cover; background-position: center;">
+        </div>
+        <div style="padding: 20px;">
+          <h3 style="color: #a3164d; font-size: 18px; margin-bottom: 8px;">United Kingdom</h3>
+          <p style="color: #666; font-size: 14px; margin-bottom: 12px;">Study in historic universities with
+            world-class education</p>
+          <a href="#" style="color: #a3164d; font-size: 14px; font-weight: 600;">Learn more →</a>
+        </div>
+      </div>
+      <div
+        style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; cursor: pointer; transition: all 0.2s;">
+        <div
+          style="height: 180px; background-image: url('country-netherlands.png'); background-size: cover; background-position: center;">
+        </div>
+        <div style="padding: 20px;">
+          <h3 style="color: #a3164d; font-size: 18px; margin-bottom: 8px;">Netherlands</h3>
+          <p style="color: #666; font-size: 14px; margin-bottom: 12px;">Experience innovative education in
+            English-taught programs</p>
+          <a href="#" style="color: #a3164d; font-size: 14px; font-weight: 600;">Learn more →</a>
+        </div>
+      </div>
+      <div
+        style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; cursor: pointer; transition: all 0.2s;">
+        <div
+          style="height: 180px; background-image: url('country-germany.png'); background-size: cover; background-position: center;">
+        </div>
+        <div style="padding: 20px;">
+          <h3 style="color: #a3164d; font-size: 18px; margin-bottom: 8px;">Germany</h3>
+          <p style="color: #666; font-size: 14px; margin-bottom: 12px;">Top-ranked universities with low or no
+            tuition fees</p>
+          <a href="#" style="color: #a3164d; font-size: 14px; font-weight: 600;">Learn more →</a>
+        </div>
+      </div>
+      <div
+        style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; cursor: pointer; transition: all 0.2s;">
+        <div
+          style="height: 180px; background-image: url('country-spain.png'); background-size: cover; background-position: center;">
+        </div>
+        <div style="padding: 20px;">
+          <h3 style="color: #a3164d; font-size: 18px; margin-bottom: 8px;">USA</h3>
+          <p style="color: #666; font-size: 14px; margin-bottom: 12px;">World's leading destination for
+            international students</p>
+          <a href="#" style="color: #a3164d; font-size: 14px; font-weight: 600;">Learn more →</a>
+        </div>
+      </div>
+    </div>
+    <div style="text-align: center; margin-top: 32px;">
+      <a href="#" style="color: #a3164d; font-size: 16px; font-weight: 600;">View all study destinations →</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="background: #2c3e50; color: white; padding: 60px 20px 20px;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div
+        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; margin-bottom: 40px;">
+        <div>
+          <h4 style="margin-bottom: 16px; font-size: 16px;">Company</h4>
+          <ul style="list-style: none; padding: 0;">
+            <li style="margin-bottom: 8px;"><a href="#"
+                style="color: #bbb; text-decoration: none; font-size: 14px;">About us</a></li>
+            <li style="margin-bottom: 8px;"><a href="#" style="color: #bbb; text-decoration: none; font-size: 14px;">For
+                Universities</a></li>
+            <li style="margin-bottom: 8px;"><a href="#"
+                style="color: #bbb; text-decoration: none; font-size: 14px;">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="margin-bottom: 16px; font-size: 16px;">Popular Programs</h4>
+          <ul style="list-style: none; padding: 0;">
+            <li style="margin-bottom: 8px;"><a href="#" style="color: #bbb; text-decoration: none; font-size: 14px;">MBA
+                Programs</a></li>
+            <li style="margin-bottom: 8px;"><a href="#"
+                style="color: #bbb; text-decoration: none; font-size: 14px;">Masters in Data Science</a>
+            </li>
+            <li style="margin-bottom: 8px;"><a href="#"
+                style="color: #bbb; text-decoration: none; font-size: 14px;">Engineering Programs</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="margin-bottom: 16px; font-size: 16px;">Resources</h4>
+          <ul style="list-style: none; padding: 0;">
+            <li style="margin-bottom: 8px;"><a href="#"
+                style="color: #bbb; text-decoration: none; font-size: 14px;">Study Guides</a></li>
+            <li style="margin-bottom: 8px;"><a href="#"
+                style="color: #bbb; text-decoration: none; font-size: 14px;">Scholarships</a></li>
+            <li style="margin-bottom: 8px;"><a href="#"
+                style="color: #bbb; text-decoration: none; font-size: 14px;">Student Stories</a></li>
+          </ul>
+        </div>
+      </div>
+      <div style="border-top: 1px solid #444; padding-top: 20px; text-align: center; color: #999; font-size: 14px;">
+        <p>© 2026 educations.com - Powered by Keystone Education Group</p>
+      </div>
+    </div>
+  </footer>
+
+
+  <script src="aria-engine.js"></script>
+  <script src="prototype1.js?v=7"></script>
+</body>
+
+</html>

@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARIA Prototype 2: Conversational Search | educations.com</title>
+    <link rel="stylesheet" href="shared-styles.css">
+    <style>
+        /* Prototype 2 Specific Styles */
+
+        /* Conversational Search Box */
+        .conversational-search {
+            background-color: var(--background-white);
+            border: 2px solid var(--primary-magenta);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-md);
+            margin-top: var(--spacing-lg);
+            transition: all 0.3s;
+        }
+
+        .conversational-search:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .search-label {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            color: var(--primary-magenta);
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .search-label svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .conversational-input {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-family: var(--font-family);
+            resize: none;
+            min-height: 40px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .conversational-input:focus {
+            outline: none;
+            border-color: var(--primary-magenta);
+            box-shadow: 0 0 0 3px rgba(163, 22, 77, 0.1);
+        }
+
+        .search-subtitle {
+            font-size: 14px;
+            color: var(--text-medium);
+            margin-top: var(--spacing-sm);
+        }
+
+        .example-questions {
+            margin-top: var(--spacing-md);
+        }
+
+        .example-questions-label {
+            font-size: 13px;
+            color: var(--text-medium);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .example-chips {
+            display: flex;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+        }
+
+        .example-chip {
+            padding: 8px 14px;
+            background-color: #f9fafb;
+            border: 1px solid var(--border-light);
+            color: var(--text-dark);
+            border-radius: var(--radius-full);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .example-chip:hover {
+            background-color: var(--primary-magenta);
+            color: white;
+            border-color: var(--primary-magenta);
+        }
+
+        /* Conversation Modal (Full Screen) */
+        .conversation-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--background-light);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+        }
+
+        .conversation-modal.active {
+            display: flex;
+        }
+
+        .conversation-header {
+            background-color: var(--background-white);
+            padding: var(--spacing-md) var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .conversation-header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            background: none;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
+        .back-btn:hover {
+            background-color: var(--background-light);
+        }
+
+        .conversation-title {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .conversation-title h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .aria-badge {
+            background: linear-gradient(135deg, var(--aria-green), var(--secondary-teal));
+            color: white;
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .new-search-btn {
+            padding: 8px 16px;
+            background-color: var(--background-light);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .new-search-btn:hover {
+            background-color: white;
+            border-color: var(--primary-magenta);
+            color: var(--primary-magenta);
+        }
+
+        .conversation-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--spacing-xl);
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .conversation-thread {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+        }
+
+        .thread-message {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .thread-message.user-message {
+            background-color: var(--background-white);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-md);
+            border-left: 4px solid var(--primary-magenta);
+        }
+
+        .thread-message.user-message .message-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--primary-magenta);
+            text-transform: uppercase;
+            margin-bottom: var(--spacing-sm);
+            letter-spacing: 0.5px;
+        }
+
+        .thread-message.user-message .message-text {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .thread-message.assistant-message .message-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .thread-message.assistant-message .aria-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--aria-green), var(--secondary-teal));
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .thread-message.assistant-message .message-author {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .thread-message.assistant-message .message-text {
+            font-size: 16px;
+            line-height: 1.7;
+            color: var(--text-dark);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .conversation-footer {
+            background-color: var(--background-white);
+            padding: var(--spacing-md) var(--spacing-lg);
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            bottom: 0;
+        }
+
+        .footer-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .footer-input-wrapper {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+
+        .footer-input {
+            flex: 1;
+            padding: 14px 18px;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            font-size: 15px;
+            font-family: var(--font-family);
+            resize: none;
+            max-height: 120px;
+        }
+
+        .footer-input:focus {
+            outline: none;
+            border-color: var(--primary-magenta);
+        }
+
+        .footer-send-btn {
+            width: 48px;
+            height: 48px;
+            background-color: var(--primary-magenta);
+            color: white;
+            border: none;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .footer-send-btn:hover {
+            background-color: var(--primary-magenta-hover);
+            transform: scale(1.05);
+        }
+
+        .footer-send-btn:disabled {
+            background-color: var(--text-light);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Programs Display in Thread */
+        .thread-programs {
+            display: grid;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-md);
+        }
+
+        .thread-program-card {
+            background-color: var(--background-white);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .thread-program-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateX(4px);
+            border-color: var(--primary-magenta);
+        }
+
+        .thread-program-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-magenta);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .thread-program-card .university {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .thread-program-card .location {
+            font-size: 14px;
+            color: var(--text-medium);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .thread-program-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-md);
+            padding-top: var(--spacing-md);
+            border-top: 1px solid var(--border-light);
+        }
+
+        .thread-program-detail {
+            font-size: 13px;
+            color: var(--text-medium);
+        }
+
+        .thread-program-detail strong {
+            color: var(--text-dark);
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        /* Listing Link Card in Thread */
+        .listing-link-card {
+            background: linear-gradient(135deg, var(--primary-magenta), #7b1042);
+            color: white;
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-md);
+            margin-top: var(--spacing-md);
+            text-decoration: none;
+            display: block;
+            transition: all 0.2s;
+        }
+
+        .listing-link-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .listing-link-card h4 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+            color: white;
+        }
+
+        .listing-link-card p {
+            font-size: 15px;
+            opacity: 0.9;
+            margin-bottom: var(--spacing-sm);
+            color: white;
+        }
+
+        .listing-link-card .cta {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            font-size: 15px;
+            font-weight: 600;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-full);
+            margin-top: var(--spacing-sm);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .conversation-content {
+                padding: var(--spacing-md);
+            }
+
+            .thread-program-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="#" class="logo">
+                <img src="educations-logo.png" alt="educations.com">
+            </a>
+            <nav class="nav">
+                <a href="#" class="nav-link">Programs</a>
+                <a href="#" class="nav-link">Resources</a>
+                <a href="#" class="btn btn-secondary">Recommend me a program</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>120,000+ study abroad programs, one perfect for you.</h1>
+
+                <!-- Conversational Search -->
+                <div class="conversational-search">
+                    <div class="search-label">
+                        <svg fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
+                            <path
+                                d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z" />
+                        </svg>
+                        <span>Ask ARIA Anything</span>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; align-items: flex-start;">
+                        <textarea class="conversational-input" id="mainInput"
+                            placeholder="E.g., 'I want to study data science in Germany' or 'Affordable MBA programs in Europe'"
+                            rows="1" onkeydown="handleMainInputKeydown(event)" style="flex: 1;"></textarea>
+
+                        <button onclick="focusMainInput()"
+                            style="padding: 12px 20px; background: linear-gradient(135deg, var(--primary-magenta), #7b1042); color: white; border: none; border-radius: var(--radius-md); font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; height: fit-content; margin-top: 0; transition: all 0.2s;">
+                            Ask ARIA
+                        </button>
+                    </div>
+
+                    <p class="search-subtitle">
+                        Type your question and click "Ask ARIA" or press Enter to start a personalized conversation
+                    </p>
+
+                    <div class="example-questions">
+                        <div class="example-questions-label">Try asking:</div>
+                        <div class="example-chips">
+                            <button class="example-chip" onclick="askExample('Best countries for engineering degrees')">
+                                Best countries for engineering degrees
+                            </button>
+                            <button class="example-chip" onclick="askExample('Affordable MBA programs in Europe')">
+                                Affordable MBA programs in Europe
+                            </button>
+                            <button class="example-chip"
+                                onclick="askExample('Computer science programs taught in English')">
+                                Computer science programs taught in English
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-image"></div>
+        </div>
+    </section>
+
+    </div>
+
+            <!-- Begin your study abroad journey -->
+            <section style="background: #f9fafb; padding: 60px 20px;">
+                <div style="max-width: 1200px; margin: 0 auto;">
+                    <h2 style="font-size: 28px; font-weight: 700; margin-bottom: 40px; text-align: center;">Begin your
+                        study abroad
+                        journey</h2>
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; text-align: center;">
+                        <div>
+                            <div
+                                style="width: 80px; height: 80px; background: linear-gradient(135deg, #5bbeaf, #00bcd4); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 32px;">
+                                🔍</div>
+                            <h3 style="font-size: 18px; margin-bottom: 12px; font-weight: 600;">Find a program</h3>
+                            <p style="color: #666; font-size: 14px;">Browse thousands of programs worldwide</p>
+                        </div>
+                        <div>
+                            <div
+                                style="width: 80px; height: 80px; background: linear-gradient(135deg, #5bbeaf, #00bcd4); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 32px;">
+                                💰</div>
+                            <h3 style="font-size: 18px; margin-bottom: 12px; font-weight: 600;">Get scholarships</h3>
+                            <p style="color: #666; font-size: 14px;">Find funding for your studies abroad</p>
+                        </div>
+                        <div>
+                            <div
+                                style="width: 80px; height: 80px; background: linear-gradient(135deg, #5bbeaf, #00bcd4); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 32px;">
+                                📚</div>
+                            <h3 style="font-size: 18px; margin-bottom: 12px; font-weight: 600;">Get university brochures
+                            </h3>
+                            <p style="color: #666; font-size: 14px;">Request information from schools</p>
+                        </div>
+                        <div>
+                            <div
+                                style="width: 80px; height: 80px; background: linear-gradient(135deg, #5bbeaf, #00bcd4); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 32px;">
+                                📰</div>
+                            <h3 style="font-size: 18px; margin-bottom: 12px; font-weight: 600;">Stay up-to-date</h3>
+                            <p style="color: #666; font-size: 14px;">Get the latest study abroad tips</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Explore highly-ranked countries -->
+            <section style="padding: 60px 20px; max-width: 1200px; margin: 0 auto;">
+                <h2 style="font-size: 28px; font-weight: 700; margin-bottom: 16px;">Explore highly-ranked countries</h2>
+                <p style="color: #666; font-size: 16px; margin-bottom: 40px;">You're one click away from exploring
+                    hundreds of
+                    programs in your next study destination</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+                    <div
+                        style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; cursor: pointer; transition: all 0.2s;">
+                        <div
+                            style="height: 180px; background-image: url('country-uk.png'); background-size: cover; background-position: center;">
+                        </div>
+                        <div style="padding: 20px;">
+                            <span
+                                style="background: #5bbeaf; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">COUNTRY</span>
+                            <h3 style="color: #a3164d; font-size: 18px; margin: 12px 0 8px;">United Kingdom</h3>
+                            <p style="color: #666; font-size: 14px; margin-bottom: 12px;">Study in historic universities
+                                with
+                                world-class education</p>
+                            <a href="#"
+                                style="color: #a3164d; font-size: 14px; font-weight: 600; text-decoration: none;">Learn
+                                more
+                                →</a>
+                        </div>
+                    </div>
+                    <div
+                        style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; cursor: pointer; transition: all 0.2s;">
+                        <div
+                            style="height: 180px; background-image: url('country-netherlands.png'); background-size: cover; background-position: center;">
+                        </div>
+                        <div style="padding: 20px;">
+                            <span
+                                style="background: #5bbeaf; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">COUNTRY</span>
+                            <h3 style="color: #a3164d; font-size: 18px; margin: 12px 0 8px;">Netherlands</h3>
+                            <p style="color: #666; font-size: 14px; margin-bottom: 12px;">Experience innovative
+                                education in
+                                English-taught programs</p>
+                            <a href="#"
+                                style="color: #a3164d; font-size: 14px; font-weight: 600; text-decoration: none;">Learn
+                                more
+                                →</a>
+                        </div>
+                    </div>
+                    <div
+                        style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; cursor: pointer; transition: all 0.2s;">
+                        <div
+                            style="height: 180px; background-image: url('country-germany.png'); background-size: cover; background-position: center;">
+                        </div>
+                        <div style="padding: 20px;">
+                            <span
+                                style="background: #5bbeaf; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">COUNTRY</span>
+                            <h3 style="color: #a3164d; font-size: 18px; margin: 12px 0 8px;">Germany</h3>
+                            <p style="color: #666; font-size: 14px; margin-bottom: 12px;">Top-ranked universities with
+                                low or no
+                                tuition fees</p>
+                            <a href="#"
+                                style="color: #a3164d; font-size: 14px; font-weight: 600; text-decoration: none;">Learn
+                                more
+                                →</a>
+                        </div>
+                    </div>
+                    <div
+                        style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; cursor: pointer; transition: all 0.2s;">
+                        <div
+                            style="height: 180px; background-image: url('country-spain.png'); background-size: cover; background-position: center;">
+                        </div>
+                        <div style="padding: 20px;">
+                            <span
+                                style="background: #5bbeaf; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">COUNTRY</span>
+                            <h3 style="color: #a3164d; font-size: 18px; margin: 12px 0 8px;">USA</h3>
+                            <p style="color: #666; font-size: 14px; margin-bottom: 12px;">World's leading destination
+                                for
+                                international students</p>
+                            <a href="#"
+                                style="color: #a3164d; font-size: 14px; font-weight: 600; text-decoration: none;">Learn
+                                more
+                                →</a>
+                        </div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 32px;">
+                    <a href="#" style="color: #a3164d; font-size: 16px; font-weight: 600; text-decoration: none;">View
+                        all study
+                        destinations →</a>
+                </div>
+            </section>
+
+            <!-- Scholarships for international students -->
+            <section style="background: #f9fafb; padding: 60px 20px;">
+                <div style="max-width: 1200px; margin: 0 auto;">
+                    <h2 style="font-size: 28px; font-weight: 700; margin-bottom: 16px;">Scholarships for international
+                        students</h2>
+                    <p style="color: #666; font-size: 16px; margin-bottom: 40px;">Can't find what you're looking for?
+                        Try searching
+                        with keywords like your next college...</p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 24px;">
+                        <div
+                            style="background: white; border: 1px solid #e0e0e0; border-radius: 8px; padding: 24px; display: flex; gap: 20px;">
+                            <div
+                                style="width: 100px; height: 100px; background: linear-gradient(135deg, #5bbeaf, #00bcd4); border-radius: 8px; flex-shrink: 0;">
+                            </div>
+                            <div>
+                                <span
+                                    style="background: #fef3c7; color: #92400e; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">SCHOLARSHIP</span>
+                                <h3 style="color: #333; font-size: 16px; margin: 12px 0 8px; font-weight: 600;">Fully
+                                    Funded
+                                    Scholarships January 2026</h3>
+                                <p style="color: #666; font-size: 14px; margin-bottom: 12px;">Find scholarships with
+                                    full tuition
+                                    coverage</p>
+                                <a href="#"
+                                    style="color: #a3164d; font-size: 14px; font-weight: 600; text-decoration: none;">Read
+                                    more →</a>
+                            </div>
+                        </div>
+                        <div
+                            style="background: white; border: 1px solid #e0e0e0; border-radius: 8px; padding: 24px; display: flex; gap: 20px;">
+                            <div
+                                style="width: 100px; height: 100px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 8px; flex-shrink: 0;">
+                            </div>
+                            <div>
+                                <span
+                                    style="background: #fef3c7; color: #92400e; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">SCHOLARSHIP</span>
+                                <h3 style="color: #333; font-size: 16px; margin: 12px 0 8px; font-weight: 600;">Top
+                                    Scholarships for
+                                    MBA Students</h3>
+                                <p style="color: #666; font-size: 14px; margin-bottom: 12px;">Business school funding
+                                    opportunities
+                                </p>
+                                <a href="#"
+                                    style="color: #a3164d; font-size: 14px; font-weight: 600; text-decoration: none;">Read
+                                    more →</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Guides for international students -->
+            <section style="padding: 60px 20px; max-width: 1200px; margin: 0 auto;">
+                <h2 style="font-size: 28px; font-weight: 700; margin-bottom: 16px;">Guides for international students
+                </h2>
+                <p style="color: #666; font-size: 16px; margin-bottom: 40px;">Get helpful tips and expert advice for
+                    your study
+                    abroad journey</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 24px;">
+                    <div
+                        style="background: white; border: 1px solid #e0e0e0; border-radius: 8px; padding: 24px; display: flex; gap: 20px;">
+                        <div
+                            style="width: 100px; height: 100px; background: linear-gradient(135deg, #f093fb, #f5576c); border-radius: 8px; flex-shrink: 0;">
+                        </div>
+                        <div>
+                            <span
+                                style="background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">GUIDE</span>
+                            <h3 style="color: #333; font-size: 16px; margin: 12px 0 8px; font-weight: 600;">How to
+                                Choose the Right
+                                Study Abroad Program</h3>
+                            <p style="color: #666; font-size: 14px; margin-bottom: 12px;">Expert tips for finding your
+                                perfect fit
+                            </p>
+                            <a href="#"
+                                style="color: #a3164d; font-size: 14px; font-weight: 600; text-decoration: none;">Read
+                                more
+                                →</a>
+                        </div>
+                    </div>
+                    <div
+                        style="background: white; border: 1px solid #e0e0e0; border-radius: 8px; padding: 24px; display: flex; gap: 20px;">
+                        <div
+                            style="width: 100px; height: 100px; background: linear-gradient(135deg, #fccb90, #d57eeb); border-radius: 8px; flex-shrink: 0;">
+                        </div>
+                        <div>
+                            <span
+                                style="background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">GUIDE</span>
+                            <h3 style="color: #333; font-size: 16px; margin: 12px 0 8px; font-weight: 600;">Student Visa
+                                Requirements by Country</h3>
+                            <p style="color: #666; font-size: 14px; margin-bottom: 12px;">Navigate visa applications
+                                with ease</p>
+                            <a href="#"
+                                style="color: #a3164d; font-size: 14px; font-weight: 600; text-decoration: none;">Read
+                                more
+                                →</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="conversation-thread" id="conversationThread">
+                <!-- Messages added by JS -->
+            </div>
+        </div>
+
+        <div class="conversation-footer">
+            <div class="footer-content">
+                <div class="footer-input-wrapper">
+                    <textarea class="footer-input" id="conversationInput" placeholder="Continue the conversation..."
+                        rows="1" onkeydown="handleConversationKeydown(event)"></textarea>
+                    <button class="footer-send-btn" onclick="sendConversationMessage()" id="conversationSendBtn">
+                        <svg width="22" height="22" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                                d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Homepage Sections -->
+    <section style="padding: 60px 20px; max-width: 1200px; margin: 0 auto;">
+        <h2 style="font-size: 28px; font-weight: 700; margin-bottom: 40px; text-align: center;">What do you want to
+            study?</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+            <div style="border: 1px solid #e0e0e0; padding: 24px; border-radius: 8px;">
+                <h3 style="color: #a3164d; font-size: 18px; margin-bottom: 8px;">Business Degrees</h3>
+                <p style="color: #666; font-size: 14px;">MBA programs and more</p>
+            </div>
+            <div style="border: 1px solid #e0e0e0; padding: 24px; border-radius: 8px;">
+                <h3 style="color: #a3164d; font-size: 18px; margin-bottom: 8px;">Engineering Degrees</h3>
+                <p style="color: #666; font-size: 14px;">1000+ programs</p>
+            </div>
+            <div style="border: 1px solid #e0e0e0; padding: 24px; border-radius: 8px;">
+                <h3 style="color: #a3164d; font-size: 18px; margin-bottom: 8px;">Computer Science</h3>
+                <p style="color: #666; font-size: 14px;">Tech programs</p>
+            </div>
+            <div style="border: 1px solid #e0e0e0; padding: 24px; border-radius: 8px;">
+                <h3 style="color: #a3164d; font-size: 18px; margin-bottom: 8px;">Healthcare</h3>
+                <p style="color: #666; font-size: 14px;">Medical programs</p>
+            </div>
+        </div>
+    </section>
+
+    <footer style="background: #2c3e50; color: white; padding: 40px 20px;">
+        <div style="max-width: 1200px; margin: 0 auto; text-align: center; color: #999; font-size: 14px;">
+            <p>© 2026 educations.com - Powered by Keystone Education Group</p>
+        </div>
+    </footer>
+
+    <script src="aria-engine.js"></script>
+    <script src="prototype2.js"></script>
+</body>
+
+</html>
