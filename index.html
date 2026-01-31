@@ -54,6 +54,9 @@
             border-radius: var(--radius-md);
             padding: var(--spacing-lg);
             transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
         .prototype-card:hover {
@@ -77,6 +80,8 @@
         .prototype-card ul {
             list-style: none;
             margin-bottom: var(--spacing-lg);
+            flex: 1;
+            /* Allow list to grow if needed */
         }
 
         .prototype-card li {
@@ -107,6 +112,8 @@
             display: inline-block;
             text-align: center;
             transition: all 0.2s;
+            margin-top: auto;
+            /* Push to bottom */
         }
 
         .demo-btn:hover {
